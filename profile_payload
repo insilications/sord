@@ -1,1 +1,7 @@
 ./waf -v test
+pushd builddir/
+./sordmm_test ../tests/UTF-8.ttl || :
+./sordmm_test || :
+./sord_validate ../tests/UTF-8.ttl || :
+./sord_validate ../tests/manifest.ttl || :
+popd

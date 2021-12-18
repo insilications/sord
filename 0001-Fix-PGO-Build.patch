@@ -1,14 +1,14 @@
-From 4f418df5f8fa2fcaa31dc6d7600766e49f3da1dd Mon Sep 17 00:00:00 2001
+From ca822c48eebc6970db7fc06867f3b3af526c4c87 Mon Sep 17 00:00:00 2001
 From: Francisco Boni <boboniboni@gmail.com>
 Date: Sat, 18 Dec 2021 10:30:33 -0300
 Subject: [PATCH] Fix PGO Build
 
 ---
- wscript | 77 +++++++++++++++++++++++++++------------------------------
- 1 file changed, 37 insertions(+), 40 deletions(-)
+ wscript | 85 ++++++++++++++++++++++++++++-----------------------------
+ 1 file changed, 42 insertions(+), 43 deletions(-)
 
 diff --git a/wscript b/wscript
-index fd8578e..529765f 100644
+index fd8578e..ea171df 100644
 --- a/wscript
 +++ b/wscript
 @@ -218,67 +218,64 @@ def build(bld):
@@ -115,7 +115,29 @@ index fd8578e..529765f 100644
                        uselib       = 'SERD')
  
      # Utilities
-@@ -346,7 +343,7 @@ def test(tst):
+@@ -295,16 +292,18 @@ def build(bld):
+                       uselib       = 'SERD',
+                       target       = i,
+                       install_path = '${BINDIR}',
+-                      defines      = defines)
++                      defines      = defines,
++                      linkflags    = [''])
+             if not bld.env.BUILD_SHARED or bld.env.STATIC_PROGS:
+                 obj.use = 'libsord_static'
++                #obj.defines += ['SORD_STATIC', 'ZIX_STATIIC']
+             if bld.env.STATIC_PROGS:
+                 obj.env.SHLIB_MARKER = obj.env.STLIB_MARKER
+                 obj.linkflags        = ['-static', '-Wl,--start-group']
+             if i == 'sord_validate':
+                 obj.uselib    += ' PCRE'
+-                obj.cflags    = bld.env.PTHREAD_CFLAGS
+-                obj.linkflags = bld.env.PTHREAD_LINKFLAGS
++                obj.cflags    = obj.linkflags + bld.env.PTHREAD_CFLAGS
++                obj.linkflags = obj.linkflags + bld.env.PTHREAD_LINKFLAGS
+ 
+     # Documentation
+     autowaf.build_dox(bld, 'SORD', SORD_VERSION, top, out)
+@@ -346,7 +345,7 @@ def test(tst):
          pass
  
      srcdir = tst.path.abspath()
