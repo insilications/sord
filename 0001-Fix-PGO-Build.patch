@@ -1,0 +1,129 @@
+From 4f418df5f8fa2fcaa31dc6d7600766e49f3da1dd Mon Sep 17 00:00:00 2001
+From: Francisco Boni <boboniboni@gmail.com>
+Date: Sat, 18 Dec 2021 10:30:33 -0300
+Subject: [PATCH] Fix PGO Build
+
+---
+ wscript | 77 +++++++++++++++++++++++++++------------------------------
+ 1 file changed, 37 insertions(+), 40 deletions(-)
+
+diff --git a/wscript b/wscript
+index fd8578e..529765f 100644
+--- a/wscript
++++ b/wscript
+@@ -218,67 +218,64 @@ def build(bld):
+                                      'ZIX_INTERNAL'])
+ 
+     if bld.env.BUILD_TESTS:
+-        test_libs      = libs
+-        test_cflags    = ['']
+-        test_linkflags = ['']
+-        if not bld.env.NO_COVERAGE:
+-            test_cflags    += ['--coverage']
+-            test_linkflags += ['--coverage']
++        #test_libs      = libs
++        #test_cflags    = ['']
++        #test_linkflags = ['']
++        #if not bld.env.NO_COVERAGE:
++            #test_cflags    += ['--coverage']
++            #test_linkflags += ['--coverage']
+ 
+         # Profiled static library for test coverage
+-        obj = bld(features     = 'c cstlib',
+-                  source       = source,
+-                  includes     = ['.', 'include', './src'],
+-                  name         = 'libsord_profiled',
+-                  target       = 'sord_profiled',
+-                  install_path = '',
+-                  defines      = defines + ['SORD_STATIC',
+-                                            'SORD_INTERNAL',
+-                                            'ZIX_STATIC',
+-                                            'ZIX_INTERNAL'],
+-                  cflags       = test_cflags,
+-                  linkflags    = test_linkflags,
+-                  lib          = test_libs,
+-                  uselib       = 'SERD')
++        #obj = bld(features     = 'c cstlib',
++                  #source       = source,
++                  #includes     = ['.', 'include', './src'],
++                  #name         = 'libsord_profiled',
++                  #target       = 'sord_profiled',
++                  #install_path = '',
++                  #defines      = defines + ['SORD_STATIC',
++                                            #'SORD_INTERNAL',
++                                            #'ZIX_STATIC',
++                                            #'ZIX_INTERNAL'],
++                  #cflags       = test_cflags,
++                  #linkflags    = test_linkflags,
++                  #lib          = test_libs,
++                  #uselib       = 'SERD')
+ 
+         # Unit test program
+         obj = bld(features     = 'c cprogram',
+                   source       = 'src/sord_test.c',
+                   includes     = ['.', 'include', './src'],
+-                  use          = 'libsord_profiled',
+-                  lib          = test_libs,
++                  use          = 'libsord_static',
++                  lib          = libs,
+                   target       = 'sord_test',
+                   install_path = '',
+                   defines      = defines + ['SORD_STATIC', 'ZIX_STATIC'],
+-                  cflags       = test_cflags,
+-                  linkflags    = test_linkflags,
++                  cflags       = libflags,
+                   uselib       = 'SERD')
+ 
+         # Static profiled sordi for tests
+-        obj = bld(features     = 'c cprogram',
+-                  source       = 'src/sordi.c',
+-                  includes     = ['.', 'include', './src'],
+-                  use          = 'libsord_profiled',
+-                  lib          = test_libs,
+-                  target       = 'sordi_static',
+-                  install_path = '',
+-                  defines      = defines + ['SORD_STATIC', 'ZIX_STATIC'],
+-                  cflags       = test_cflags,
+-                  linkflags    = test_linkflags,
+-                  uselib       = 'SERD')
++        #obj = bld(features     = 'c cprogram',
++                  #source       = 'src/sordi.c',
++                  #includes     = ['.', 'include', './src'],
++                  #use          = 'libsord_static',
++                  #lib          = libs,
++                  #target       = 'sordi_static',
++                  #install_path = '',
++                  #defines      = defines + ['SORD_STATIC', 'ZIX_STATIC'],
++                  #cflags       = libflags,
++                  #uselib       = 'SERD')
+ 
+         # C++ build test
+         if bld.env.COMPILER_CXX:
+             obj = bld(features     = 'cxx cxxprogram',
+                       source       = 'src/sordmm_test.cpp',
+                       includes     = ['.', 'include', './src'],
+-                      use          = 'libsord_profiled',
+-                      lib          = test_libs,
++                      use          = 'libsord_static',
++                      lib          = libs,
+                       target       = 'sordmm_test',
+                       install_path = '',
+                       defines      = defines + ['SORD_STATIC', 'ZIX_STATIIC'],
+-                      cxxflags     = test_cflags,
+-                      linkflags    = test_linkflags,
++                      cxxflags     = libflags,
+                       uselib       = 'SERD')
+ 
+     # Utilities
+@@ -346,7 +343,7 @@ def test(tst):
+         pass
+ 
+     srcdir = tst.path.abspath()
+-    sordi = './sordi_static'
++    sordi = './sordi'
+     base = 'http://example.org/'
+     snippet = '<{0}s> <{0}p> <{0}o> .\n'.format(base)
+     manifest = 'file://%s/tests/manifest.ttl' % srcdir.replace('\\', '/')
+-- 
+2.34.1
+

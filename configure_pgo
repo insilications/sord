@@ -1,0 +1,5 @@
+--static-progs
+--static
+--no-coverage
+--test
+--no-shared
