@@ -5,12 +5,15 @@
 %define keepstatic 1
 Name     : sord
 Version  : 0.16.8
-Release  : 328
+Release  : 329
 URL      : file:///aot/build/clearlinux/packages/sord/sord-v0.16.8.tar.gz
 Source0  : file:///aot/build/clearlinux/packages/sord/sord-v0.16.8.tar.gz
 Summary  : A lightweight C library for storing RDF statements in memory.
 Group    : Development/Tools
 License  : GPL-2.0
+Requires: sord-bin = %{version}-%{release}
+Requires: sord-lib = %{version}-%{release}
+Requires: sord-man = %{version}-%{release}
 BuildRequires : buildreq-configure
 BuildRequires : buildreq-distutils3
 BuildRequires : bzip2-dev
@@ -64,6 +67,51 @@ Sord
 Sord is a lightweight C library for storing RDF statements in memory.
 For more information, see <http://drobilla.net/software/sord>.
 
+%package bin
+Summary: bin components for the sord package.
+Group: Binaries
+
+%description bin
+bin components for the sord package.
+
+
+%package dev
+Summary: dev components for the sord package.
+Group: Development
+Requires: sord-lib = %{version}-%{release}
+Requires: sord-bin = %{version}-%{release}
+Provides: sord-devel = %{version}-%{release}
+Requires: sord = %{version}-%{release}
+
+%description dev
+dev components for the sord package.
+
+
+%package lib
+Summary: lib components for the sord package.
+Group: Libraries
+
+%description lib
+lib components for the sord package.
+
+
+%package man
+Summary: man components for the sord package.
+Group: Default
+
+%description man
+man components for the sord package.
+
+
+%package staticdev
+Summary: staticdev components for the sord package.
+Group: Default
+Requires: sord-dev = %{version}-%{release}
+
+%description staticdev
+staticdev components for the sord package.
+
+
 %prep
 %setup -q -n sord
 cd %{_builddir}/sord
@@ -78,7 +126,7 @@ unset https_proxy
 unset no_proxy
 export SSL_CERT_FILE=/var/cache/ca-certs/anchors/ca-certificates.crt
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1639834776
+export SOURCE_DATE_EPOCH=1639835191
 unset LD_AS_NEEDED
 export GCC_IGNORE_WERROR=1
 ## altflags_pgo content
@@ -325,3 +373,29 @@ popd
 
 %files
 %defattr(-,root,root,-)
+
+%files bin
+%defattr(-,root,root,-)
+/usr/bin/sord_validate
+/usr/bin/sordi
+
+%files dev
+%defattr(-,root,root,-)
+/usr/include/sord-0/sord/sord.h
+/usr/include/sord-0/sord/sordmm.hpp
+/usr/lib64/libsord-0.so
+/usr/lib64/pkgconfig/sord-0.pc
+
+%files lib
+%defattr(-,root,root,-)
+/usr/lib64/libsord-0.so.0
+/usr/lib64/libsord-0.so.0.16.9
+
+%files man
+%defattr(0644,root,root,0755)
+/usr/share/man/man1/sord_validate.1
+/usr/share/man/man1/sordi.1
+
+%files staticdev
+%defattr(-,root,root,-)
+/usr/lib64/libsord-0.a
